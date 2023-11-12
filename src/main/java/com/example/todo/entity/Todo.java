@@ -9,9 +9,10 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class TodoEntity extends BaseEntity {
+public class Todo extends BaseEntity {
 
     @Id
+    @Column(name = "todo_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -20,5 +21,9 @@ public class TodoEntity extends BaseEntity {
 
     @Column(nullable = false)
     private Boolean completed;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

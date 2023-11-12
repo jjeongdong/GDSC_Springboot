@@ -15,12 +15,14 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> dtoValidation(final MethodArgumentNotValidException e) {
+
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getAllErrors().forEach((error)-> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(errors);
     }
