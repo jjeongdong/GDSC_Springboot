@@ -1,5 +1,6 @@
 package com.example.todo.controller;
 
+import com.example.todo.dto.AuthResponse;
 import com.example.todo.dto.UserDto;
 import com.example.todo.service.UserService;
 import jakarta.validation.Valid;
@@ -26,9 +27,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody @Valid UserDto userDto) {
-        return userService.login(userDto.getUsername(), userDto.getPassword());
-
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid UserDto userDto) {
+        return ResponseEntity.ok(userService.login(userDto.getUsername(), userDto.getPassword()));
     }
 
 }

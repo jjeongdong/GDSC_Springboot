@@ -36,7 +36,7 @@ public class TodoService {
             return userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
         }
 
-        throw new RuntimeException("Invalid token");
+        throw new RuntimeException("Invalid Access Token");
 
     }
 

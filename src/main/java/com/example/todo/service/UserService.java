@@ -1,8 +1,11 @@
 package com.example.todo.service;
 
 import com.example.todo.config.jwt.JwtUtils;
+import com.example.todo.dto.AuthResponse;
 import com.example.todo.dto.UserDto;
+import com.example.todo.entity.RefreshToken;
 import com.example.todo.entity.User;
+import com.example.todo.repository.RefreshTokenRepository;
 import com.example.todo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import java.util.Objects;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtils jwtUtils;
 
 
@@ -32,16 +36,22 @@ public class UserService {
         return userDto;
     }
 
-
     @Transactional
-    public String login(String username, String password) {
+    public AuthResponse login(String username, String password) {
         User user = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
 
         if (user != null && Objects.equals(user.getPassword(), password)) {
-            // 인증 성공 시 JWT 토큰 생성 및 반환
-            return jwtUtils.generateToken(username);
+            String accessToken = jwtUtils.generateAccessToken(username);
+            String refreshToken = jwtUtils.generateRefreshToken(username);
+
+            RefreshToken refreshTokenEntity = new RefreshToken();
+            refreshTokenEntity.setToken(refreshToken);
+            refreshTokenEntity.setUser(user);
+
+            refreshTokenRepository.save(refreshTokenEntity);
+
+            return new AuthResponse(accessToken, refreshToken);
         } else {
-            // 인증 실패 시 AuthenticationException 발생
             throw new RuntimeException("Authentication failed");
         }
 

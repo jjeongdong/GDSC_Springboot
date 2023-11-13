@@ -1,13 +1,11 @@
 package com.example.todo.controller;
 
-import com.example.todo.config.jwt.JwtUtils;
 import com.example.todo.dto.PageResponseDto;
 import com.example.todo.dto.TodoDto;
 import com.example.todo.dto.TodoListDto;
 import com.example.todo.service.TodoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

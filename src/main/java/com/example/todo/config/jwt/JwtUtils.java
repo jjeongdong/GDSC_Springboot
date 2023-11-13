@@ -18,12 +18,23 @@ public class JwtUtils {
     @Value("${jwt.expiration}")
     private int expiration;
 
+    @Value("${jwt.refreshExpiration}")
+    private int refreshExpiration; // Added for refresh token expiration
 
-    public String generateToken(String username) {
+    public String generateAccessToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + (expiration * 1000L)))
+                .signWith(SignatureAlgorithm.HS256, secret.getBytes())
+                .compact();
+    }
+
+    public String generateRefreshToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + (refreshExpiration * 1000L)))
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes())
                 .compact();
     }
@@ -36,6 +47,13 @@ public class JwtUtils {
                 .getSubject();
     }
 
+    public String getUsernameFromRefreshToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(secret.getBytes())
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
 
     public boolean validateToken(String token) {
         try {
@@ -53,7 +71,6 @@ public class JwtUtils {
             return false;
         }
     }
-
 
     private String parseBearer(String token) {
         return token.replace("Bearer", "").trim();
