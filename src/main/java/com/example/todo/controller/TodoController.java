@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class TodoController {
 
     private final TodoService todoService;
-    private final JwtUtils jwtUtils;
 
     @GetMapping("/list")
     public PageResponseDto list (
@@ -37,17 +36,11 @@ public class TodoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createTodo(@RequestBody @Valid TodoDto todoDto, @RequestHeader("Authorization") String token) {
-
-        // ???
-        if (token != null && jwtUtils.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
-        }
-
+    public ResponseEntity<TodoDto> createTodo(@RequestBody @Valid TodoDto todoDto, @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(todoService.createTodo(todoDto, token));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<TodoDto> updateTodoById(@PathVariable Long id, @Valid @RequestBody TodoDto todoDto, @RequestHeader("Authorization") String token) {
         TodoDto updatedTodo = todoService.updateTodoById(id, todoDto, token);
         return ResponseEntity.ok(updatedTodo);

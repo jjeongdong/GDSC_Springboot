@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.naming.AuthenticationException;
 
 @RestController
-@RequestMapping("/members")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -25,8 +25,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserDto userDto) throws AuthenticationException {
-        return userService.authenticate(userDto.getUsername(), userDto.getPassword());
+    public String login(@RequestBody UserDto userDto) {
+        return userService.login(userDto.getUsername(), userDto.getPassword());
+
     }
 
 }

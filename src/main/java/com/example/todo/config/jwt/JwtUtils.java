@@ -18,12 +18,7 @@ public class JwtUtils {
     @Value("${jwt.expiration}")
     private int expiration;
 
-    /**
-     * Generates a JWT token for the given username.
-     *
-     * @param username The username for which the token is generated.
-     * @return The generated JWT token.
-     */
+
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -44,17 +39,21 @@ public class JwtUtils {
 
     public boolean validateToken(String token) {
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(token);
+            // 토큰 파싱 및 서명 검증
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(parseBearer(token));
 
-            // Check if the token has expired
+            // 토큰 만료 여부 확인
             Date expirationDate = claims.getBody().getExpiration();
             Date now = new Date();
+
+            // 토큰이 만료되지 않았으면 유효한 토큰으로 간주
             return !expirationDate.before(now);
         } catch (Exception e) {
-            // Token validation failed (e.g., due to signature mismatch or expired token)
+            // 토큰 유효성 검사 실패 (예: 서명 불일치 또는 만료된 토큰)
             return false;
         }
     }
+
 
     private String parseBearer(String token) {
         return token.replace("Bearer", "").trim();

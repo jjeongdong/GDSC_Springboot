@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.naming.AuthenticationException;
 import java.util.Objects;
 
 @Service
@@ -35,10 +34,10 @@ public class UserService {
 
 
     @Transactional
-    public String authenticate(String username, String password) throws AuthenticationException {
+    public String login(String username, String password) {
         User user = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
 
-        if (user != null && (Objects.equals(user.getPassword(), password))) {
+        if (user != null && Objects.equals(user.getPassword(), password)) {
             // 인증 성공 시 JWT 토큰 생성 및 반환
             return jwtUtils.generateToken(username);
         } else {

@@ -27,10 +27,20 @@ public class TodoService {
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
 
-    private User getUserFromToken(String token) {
-        String username = jwtUtils.getUsernameFromToken(token);
-        return userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+
+    public User getUserFromToken(String token) {
+
+        if (token != null && jwtUtils.validateToken(token)) {
+            String username = jwtUtils.getUsernameFromToken(token);
+
+            return userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        }
+
+        throw new RuntimeException("Invalid token");
+
     }
+
+
 
     @Transactional
     public TodoDto createTodo(TodoDto todoDto, String token) {
@@ -43,7 +53,6 @@ public class TodoService {
                 .build();
 
         todoRepository.save(todo);
-
         return todoDto;
     }
 
