@@ -12,10 +12,11 @@ import lombok.*;
 @RequiredArgsConstructor
 public class RefreshToken extends BaseEntity {
     @Id
+    @Column(name = "refresh_toekn_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String token;
 
     @ManyToOne
