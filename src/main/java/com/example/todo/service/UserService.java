@@ -21,6 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtils jwtUtils;
+    private final PasswordEncryptionService passwordEncryptionService;
 
 
     @Transactional
@@ -28,7 +29,7 @@ public class UserService {
 
         User user = User.builder()
                 .username(userDto.getUsername())
-                .password(userDto.getPassword())
+                .password(passwordEncryptionService.encrypt(userDto.getPassword()))
                 .build();
 
         userRepository.save(user);
@@ -40,13 +41,14 @@ public class UserService {
     public AuthResponse login(String username, String password) {
         User user = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
 
-        if (user != null && Objects.equals(user.getPassword(), password)) {
+        if (user != null && Objects.equals(user.getPassword(), passwordEncryptionService.encrypt(password))) {
             String accessToken = jwtUtils.generateAccessToken(username);
             String refreshToken = jwtUtils.generateRefreshToken(username);
 
-            RefreshToken refreshTokenEntity = new RefreshToken();
-            refreshTokenEntity.setToken(refreshToken);
-            refreshTokenEntity.setUser(user);
+            RefreshToken refreshTokenEntity = RefreshToken.builder()
+                    .token(refreshToken)
+                    .user(user)
+                    .build();
 
             refreshTokenRepository.save(refreshTokenEntity);
 
