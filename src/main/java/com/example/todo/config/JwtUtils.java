@@ -19,11 +19,15 @@ public class JwtUtils {
     private int expiration;
 
     @Value("${jwt.refreshExpiration}")
-    private int refreshExpiration; // Added for refresh token expiration
+    private int refreshExpiration;
+
 
     public String generateAccessToken(String username) {
+
+        Claims claims = Jwts.claims().setSubject(username);
+
         return Jwts.builder()
-                .setSubject(username)
+                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + (expiration * 1000L)))
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes())
@@ -31,8 +35,11 @@ public class JwtUtils {
     }
 
     public String generateRefreshToken(String username) {
+
+        Claims claims = Jwts.claims().setSubject(username);
+
         return Jwts.builder()
-                .setSubject(username)
+                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + (refreshExpiration * 1000L)))
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes())
