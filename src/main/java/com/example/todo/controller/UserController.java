@@ -28,7 +28,8 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody @Valid UserDto userDto) {
-        return ResponseEntity.ok(userService.login(userDto.getUsername(), userDto.getPassword()));
+        AuthResponse authResponse = userService.login(userDto.getUsername(), userDto.getPassword());
+        return ResponseEntity.ok(authResponse);
     }
 
 }

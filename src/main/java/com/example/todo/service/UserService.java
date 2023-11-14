@@ -1,6 +1,6 @@
 package com.example.todo.service;
 
-import com.example.todo.config.jwt.JwtUtils;
+import com.example.todo.config.JwtUtils;
 import com.example.todo.dto.AuthResponse;
 import com.example.todo.dto.UserDto;
 import com.example.todo.entity.RefreshToken;

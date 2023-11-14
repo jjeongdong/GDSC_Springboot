@@ -1,6 +1,6 @@
 package com.example.todo.service;
 
-import com.example.todo.config.jwt.JwtUtils;
+import com.example.todo.config.JwtUtils;
 import com.example.todo.dto.PageResponseDto;
 import com.example.todo.dto.TodoDto;
 import com.example.todo.dto.TodoListDto;
