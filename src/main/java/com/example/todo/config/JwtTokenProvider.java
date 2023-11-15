@@ -1,26 +1,37 @@
 package com.example.todo.config;
 
+import com.example.todo.dto.RefreshTokenResponse;
+import com.example.todo.entity.RefreshToken;
+import com.example.todo.entity.User;
+import com.example.todo.repository.RefreshTokenRepository;
+import com.example.todo.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Component
-public class JwtUtils {
+@RequiredArgsConstructor
+public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
     private String secret;
-
     @Value("${jwt.expiration}")
     private int expiration;
-
     @Value("${jwt.refreshExpiration}")
     private int refreshExpiration;
 
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
 
     public String generateAccessToken(String username) {
 
@@ -45,6 +56,21 @@ public class JwtUtils {
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes())
                 .compact();
     }
+
+    public String createNewAccessToken(String refreshToken){
+        if(validateToken(refreshToken)){
+            String username = getUsernameFromRefreshToken(refreshToken);
+            User user = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+
+            RefreshToken DBRefreshToken = refreshTokenRepository.findTopByUserOrderByIdDesc(user).orElseThrow(EntityNotFoundException::new);
+
+            if (Objects.equals(refreshToken, DBRefreshToken.getToken())) {
+                return generateAccessToken(username);
+            }
+        }
+        throw new RuntimeException("Invalid RefreshToken");
+    }
+
 
     public String getUsernameFromToken(String token) {
         return Jwts.parser()

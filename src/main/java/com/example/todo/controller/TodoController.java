@@ -4,6 +4,8 @@ import com.example.todo.dto.PageResponseDto;
 import com.example.todo.dto.TodoDto;
 import com.example.todo.dto.TodoListDto;
 import com.example.todo.service.TodoService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,42 +20,43 @@ public class TodoController {
     private final TodoService todoService;
 
     @GetMapping("/list")
-    public PageResponseDto list (
+    public PageResponseDto list(
             @RequestParam(value = "pageNo", defaultValue = "0", required = false) Integer pageNo,
             @RequestParam(value = "pageSize", defaultValue = "5", required = false) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy,
-            @RequestHeader("Authorization") String token
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
-        return todoService.findAll(pageNo, pageSize, sortBy, token);
+        return todoService.findAll(pageNo, pageSize, sortBy, request, response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TodoListDto> getTodoById(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        TodoListDto todoListDto = todoService.findTodoById(id, token);
+    public ResponseEntity<TodoListDto> getTodoById(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
+        TodoListDto todoListDto = todoService.findTodoById(id, request, response);
         return ResponseEntity.ok(todoListDto);
     }
 
     @PostMapping
-    public ResponseEntity<TodoDto> createTodo(@RequestBody @Valid TodoDto todoDto, @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(todoService.createTodo(todoDto, token));
+    public ResponseEntity<TodoDto> createTodo(@RequestBody @Valid TodoDto todoDto, HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.ok(todoService.createTodo(todoDto, request, response));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<TodoDto> updateTodoById(@PathVariable Long id, @Valid @RequestBody TodoDto todoDto, @RequestHeader("Authorization") String token) {
-        TodoDto updatedTodo = todoService.updateTodoById(id, todoDto, token);
+    public ResponseEntity<TodoDto> updateTodoById(@PathVariable Long id, @Valid @RequestBody TodoDto todoDto, HttpServletRequest request, HttpServletResponse response) {
+        TodoDto updatedTodo = todoService.updateTodoById(id, todoDto, request, response);
         return ResponseEntity.ok(updatedTodo);
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTodoById(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        todoService.deleteTodoById(id, token);
+    public ResponseEntity<Void> deleteTodoById(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
+        todoService.deleteTodoById(id, request, response);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<TodoListDto> complete(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        TodoListDto todoListDto = todoService.complete(id, token);
+    public ResponseEntity<TodoListDto> complete(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
+        TodoListDto todoListDto = todoService.complete(id, request, response);
         return ResponseEntity.ok(todoListDto);
     }
 

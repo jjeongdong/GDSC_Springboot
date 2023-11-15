@@ -13,7 +13,6 @@ public class UserDto {
     @NotBlank
     private String username;
 
-
     @NotBlank
     @Size(min = 9, max = 50)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

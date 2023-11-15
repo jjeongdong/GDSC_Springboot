@@ -1,6 +1,6 @@
 package com.example.todo.service;
 
-import com.example.todo.config.JwtUtils;
+import com.example.todo.config.JwtTokenProvider;
 import com.example.todo.dto.PageResponseDto;
 import com.example.todo.dto.TodoDto;
 import com.example.todo.dto.TodoListDto;
@@ -9,6 +9,8 @@ import com.example.todo.entity.User;
 import com.example.todo.repository.TodoRepository;
 import com.example.todo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -25,26 +27,14 @@ public class TodoService {
 
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
-    private final JwtUtils jwtUtils;
-
-
-    public User getUserFromToken(String token) {
-
-        if (token != null && jwtUtils.validateToken(token)) {
-            String username = jwtUtils.getUsernameFromToken(token);
-
-            return userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
-        }
-
-        throw new RuntimeException("Invalid Access Token");
-
-    }
-
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     @Transactional
-    public TodoDto createTodo(TodoDto todoDto, String token) {
-        User user = getUserFromToken(token);
+    public TodoDto createTodo(TodoDto todoDto, HttpServletRequest request, HttpServletResponse response) {
+
+        User user = getUserFromServlet(request);
+        user = getUser(response, user);
 
         Todo todo = Todo.builder()
                 .title(todoDto.getTitle())
@@ -57,8 +47,11 @@ public class TodoService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponseDto findAll(int pageNo, int pageSize, String sortBy, String token) {
-        User user = getUserFromToken(token);
+    public PageResponseDto findAll(int pageNo, int pageSize, String sortBy, HttpServletRequest request, HttpServletResponse response) {
+
+        User user = getUserFromServlet(request);
+        user = getUser(response, user);
+
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
         Page<Todo> todoPage = todoRepository.findAllByUser(pageable, user);
@@ -84,8 +77,9 @@ public class TodoService {
     }
 
     @Transactional(readOnly = true)
-    public TodoListDto findTodoById(Long id, String token) {
-        User user = getUserFromToken(token);
+    public TodoListDto findTodoById(Long id, HttpServletRequest request, HttpServletResponse response) {
+
+        User user = getUserFromServlet(request);
 
         Todo todo = todoRepository.findByIdAndUser(id, user).orElseThrow(EntityNotFoundException::new);
 
@@ -95,8 +89,11 @@ public class TodoService {
                 .build();
     }
 
-    public TodoDto updateTodoById(Long id, TodoDto todoDto, String token) {
-        User user = getUserFromToken(token);
+    @Transactional
+    public TodoDto updateTodoById(Long id, TodoDto todoDto, HttpServletRequest request, HttpServletResponse response) {
+
+        User user = getUserFromServlet(request);
+        user = getUser(response, user);
 
         Todo todo = todoRepository.findByIdAndUser(id, user).orElseThrow(EntityNotFoundException::new);
         todo.setTitle(todoDto.getTitle());
@@ -106,16 +103,21 @@ public class TodoService {
                 .build();
     }
 
+    @Transactional
+    public void deleteTodoById(Long id, HttpServletRequest request, HttpServletResponse response) {
 
-    public void deleteTodoById(Long id, String token) {
-        User user = getUserFromToken(token);
+        User user = getUserFromServlet(request);
+        user = getUser(response, user);
 
         Todo todo = todoRepository.findByIdAndUser(id, user).orElseThrow(EntityNotFoundException::new);
         todoRepository.delete(todo);
     }
 
-    public TodoListDto complete(Long id, String token) {
-        User user = getUserFromToken(token);
+    @Transactional
+    public TodoListDto complete(Long id, HttpServletRequest request, HttpServletResponse response) {
+
+        User user = getUserFromServlet(request);
+        user = getUser(response, user);
 
         Todo todo = todoRepository.findByIdAndUser(id, user).orElseThrow(EntityNotFoundException::new);
         todo.setCompleted(true);
@@ -124,5 +126,23 @@ public class TodoService {
                 .title(todo.getTitle())
                 .completed(todo.getCompleted())
                 .build();
+    }
+
+    private User getUser(HttpServletResponse response, User user) {
+
+        if (user == null) {
+            String newAccessToken = response.getHeader("Authorization");
+            String username = jwtTokenProvider.getUsernameFromToken(newAccessToken);
+
+            user = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+        }
+
+        return user;
+    }
+
+
+    private User getUserFromServlet(HttpServletRequest request){
+        String username = (String) request.getAttribute("username");
+        return userRepository.findByUsername(username).orElse(null);
     }
 }

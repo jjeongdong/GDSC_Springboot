@@ -1,6 +1,6 @@
 package com.example.todo.service;
 
-import com.example.todo.config.JwtUtils;
+import com.example.todo.config.JwtTokenProvider;
 import com.example.todo.dto.AuthResponse;
 import com.example.todo.dto.UserDto;
 import com.example.todo.entity.RefreshToken;
@@ -20,7 +20,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final JwtUtils jwtUtils;
+    private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncryptionService passwordEncryptionService;
 
 
@@ -42,8 +42,9 @@ public class UserService {
         User user = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
 
         if (user != null && Objects.equals(user.getPassword(), passwordEncryptionService.encrypt(password))) {
-            String accessToken = jwtUtils.generateAccessToken(username);
-            String refreshToken = jwtUtils.generateRefreshToken(username);
+
+            String accessToken = jwtTokenProvider.generateAccessToken(username);
+            String refreshToken = jwtTokenProvider.generateRefreshToken(username);
 
             RefreshToken refreshTokenEntity = RefreshToken.builder()
                     .token(refreshToken)
@@ -56,8 +57,6 @@ public class UserService {
         } else {
             throw new RuntimeException("Authentication failed");
         }
-
     }
-
 
 }
