@@ -7,11 +7,9 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class TodoListDto {
+public class UserResponseDto {
 
     @NotBlank
-    private String title;
+    private String username;
 
-    @NotBlank
-    private Boolean completed;
 }

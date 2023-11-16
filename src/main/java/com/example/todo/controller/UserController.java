@@ -1,7 +1,8 @@
 package com.example.todo.controller;
 
-import com.example.todo.dto.AuthResponse;
-import com.example.todo.dto.UserDto;
+import com.example.todo.dto.TokenResponse;
+import com.example.todo.dto.UserRequestDto;
+import com.example.todo.dto.UserResponseDto;
 import com.example.todo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +21,15 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserDto> signup(@RequestBody @Valid UserDto userDto) {
-        UserDto saveduserDto = userService.signup(userDto);
-        return ResponseEntity.ok(saveduserDto);
+    public ResponseEntity<UserResponseDto> signup(@RequestBody @Valid UserRequestDto userRequestDto) {
+        UserResponseDto userResponseDto = userService.signup(userRequestDto);
+        return ResponseEntity.ok(userResponseDto);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody @Valid UserDto userDto) {
-        AuthResponse authResponse = userService.login(userDto.getUsername(), userDto.getPassword());
-        return ResponseEntity.ok(authResponse);
+    public ResponseEntity<TokenResponse> login(@RequestBody @Valid UserRequestDto userRequestDto) {
+        TokenResponse tokenResponse = userService.login(userRequestDto.getUsername(), userRequestDto.getPassword());
+        return ResponseEntity.ok(tokenResponse);
     }
 
 }

@@ -1,11 +1,6 @@
 package com.example.todo.config;
 
-import com.example.todo.entity.RefreshToken;
-import com.example.todo.entity.User;
-import com.example.todo.repository.RefreshTokenRepository;
-import com.example.todo.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +11,6 @@ import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -33,6 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("Filter Start");
 
         String requestURI = request.getRequestURI();
+        System.out.println(requestURI);
 
         if (isWhitelistedPath(requestURI)) {
             filterChain.doFilter(request, response);
@@ -56,10 +51,12 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
 
             log.info("Refresh Token을 활용하여 Access Token을 발급합니다.");
+
             String refreshToken = request.getHeader("Refresh-Token");
             String newAccessToken = jwtTokenProvider.createNewAccessToken(refreshToken);
 
             response.setHeader("Authorization", "Bearer " + newAccessToken);
+
         }
 
         filterChain.doFilter(request, response);

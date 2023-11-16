@@ -1,16 +1,13 @@
 package com.example.todo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class PageResponseDto {
 
     private List<TodoListDto> content;
