@@ -5,6 +5,7 @@ import lombok.*;
 
 @Getter
 @Builder
+@ToString
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class TodoDto {

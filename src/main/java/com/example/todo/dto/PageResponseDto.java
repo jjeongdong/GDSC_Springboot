@@ -6,6 +6,7 @@ import java.util.List;
 
 @Getter
 @Builder
+@ToString
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class PageResponseDto {
