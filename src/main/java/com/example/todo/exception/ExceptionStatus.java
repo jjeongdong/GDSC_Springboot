@@ -2,7 +2,6 @@ package com.example.todo.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 
 @AllArgsConstructor
