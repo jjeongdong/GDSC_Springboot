@@ -60,7 +60,7 @@ public class JwtTokenProvider {
         if(validateToken(refreshToken)){
             String username = getUsernameFromRefreshToken(refreshToken);
             User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
+                    .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.USER_NOT_FOUND)));
 
             RefreshToken DBRefreshToken = refreshTokenRepository.findTopByUserOrderByIdDesc(user)
                     .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.TOKEN_NOT_FOUND)));

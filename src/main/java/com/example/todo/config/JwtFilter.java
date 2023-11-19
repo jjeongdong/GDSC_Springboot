@@ -29,7 +29,6 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("Filter Start");
 
         String requestURI = request.getRequestURI();
-        System.out.println(requestURI);
 
         if (isWhitelistedPath(requestURI)) {
             filterChain.doFilter(request, response);

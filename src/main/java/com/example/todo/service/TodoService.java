@@ -6,6 +6,7 @@ import com.example.todo.dto.TodoDto;
 import com.example.todo.dto.TodoListDto;
 import com.example.todo.entity.Todo;
 import com.example.todo.entity.User;
+import com.example.todo.exception.CustomException;
 import com.example.todo.exception.ExceptionStatus;
 import com.example.todo.repository.TodoRepository;
 import com.example.todo.repository.UserRepository;
@@ -53,7 +54,7 @@ public class TodoService {
         user = getUser(response, user);
 
         if (user.getTodoList().isEmpty()) {
-            throw new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND));
+            throw new CustomException(ExceptionStatus.TODO_NOT_FOUND);
         }
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
@@ -86,7 +87,7 @@ public class TodoService {
         user = getUser(response, user);
 
         Todo todo = todoRepository.findByIdAndUser(id, user)
-                .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
+                .orElseThrow(() -> new CustomException(ExceptionStatus.TODO_NOT_FOUND));
 
         return TodoListDto.builder()
                 .title(todo.getTitle())
@@ -101,7 +102,7 @@ public class TodoService {
         user = getUser(response, user);
 
         Todo todo = todoRepository.findByIdAndUser(id, user)
-                .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
+                .orElseThrow(() -> new CustomException(ExceptionStatus.TODO_NOT_FOUND));
 
         todo.setTitle(todoDto.getTitle());
 
@@ -117,7 +118,7 @@ public class TodoService {
         user = getUser(response, user);
 
         Todo todo = todoRepository.findByIdAndUser(id, user)
-                .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
+                .orElseThrow(() -> new CustomException(ExceptionStatus.TODO_NOT_FOUND));
 
         todoRepository.delete(todo);
     }
@@ -129,7 +130,7 @@ public class TodoService {
         user = getUser(response, user);
 
         Todo todo = todoRepository.findByIdAndUser(id, user)
-                .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
+                .orElseThrow(() -> new CustomException(ExceptionStatus.TODO_NOT_FOUND));
 
         todo.setCompleted(true);
 
@@ -152,7 +153,7 @@ public class TodoService {
             String username = jwtTokenProvider.getUsernameFromToken(newAccessToken);
 
             user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
+                    .orElseThrow(() -> new CustomException(ExceptionStatus.TODO_NOT_FOUND));
         }
 
         return user;

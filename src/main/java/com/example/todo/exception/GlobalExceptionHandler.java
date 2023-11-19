@@ -28,21 +28,26 @@ public class GlobalExceptionHandler {
                 .body(errors);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, EntityNotFoundException.class})
-    public ResponseEntity<Map<String, String>> handleException(RuntimeException ex) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR; // 기본적으로 500 Internal Server Error
-        if (ex instanceof IllegalArgumentException) {
-            status = HttpStatus.BAD_REQUEST;
-        } else if (ex instanceof EntityNotFoundException) {
-            status = HttpStatus.NOT_FOUND;
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(final CustomException e) {
+        String errorMessage = e.getExceptionStatus().getMessage();
+        String status = e.getExceptionStatus().getStatus();
+
+        ErrorResponse errorResponse = new ErrorResponse(status, errorMessage);
+
+        return ResponseEntity.status(determineHttpStatus(e))
+                .body(errorResponse);
+    }
+
+
+    private HttpStatus determineHttpStatus(final RuntimeException e) {
+        if (e instanceof IllegalArgumentException) {
+            return HttpStatus.BAD_REQUEST;
+        } else if (e instanceof EntityNotFoundException) {
+            return HttpStatus.NOT_FOUND;
+        } else {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
         }
-
-        Map<String, String> error = new HashMap<>();
-        error.put("status", status.toString());
-        error.put("message", ex.getMessage());
-
-        return ResponseEntity.status(status)
-                .body(error);
     }
 
 
