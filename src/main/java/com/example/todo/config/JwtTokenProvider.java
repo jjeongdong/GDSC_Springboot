@@ -2,6 +2,7 @@ package com.example.todo.config;
 
 import com.example.todo.entity.RefreshToken;
 import com.example.todo.entity.User;
+import com.example.todo.exception.ExceptionStatus;
 import com.example.todo.repository.RefreshTokenRepository;
 import com.example.todo.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -55,16 +56,20 @@ public class JwtTokenProvider {
     }
 
     public String createNewAccessToken(String refreshToken){
+
         if(validateToken(refreshToken)){
             String username = getUsernameFromRefreshToken(refreshToken);
-            User user = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
 
-            RefreshToken DBRefreshToken = refreshTokenRepository.findTopByUserOrderByIdDesc(user).orElseThrow(EntityNotFoundException::new);
+            RefreshToken DBRefreshToken = refreshTokenRepository.findTopByUserOrderByIdDesc(user)
+                    .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.TOKEN_NOT_FOUND)));
 
             if (Objects.equals(refreshToken, DBRefreshToken.getToken())) {
                 return generateAccessToken(username);
             }
         }
+
         throw new RuntimeException("Invalid RefreshToken");
     }
 
@@ -98,7 +103,7 @@ public class JwtTokenProvider {
             return !expirationDate.before(now);
         } catch (Exception e) {
             // 토큰 유효성 검사 실패 (예: 서명 불일치 또는 만료된 토큰)
-            return false;
+            throw new RuntimeException(String.valueOf(ExceptionStatus.INVALID_TOKEN));
         }
     }
 

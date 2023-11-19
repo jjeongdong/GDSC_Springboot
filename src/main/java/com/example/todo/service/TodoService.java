@@ -6,9 +6,9 @@ import com.example.todo.dto.TodoDto;
 import com.example.todo.dto.TodoListDto;
 import com.example.todo.entity.Todo;
 import com.example.todo.entity.User;
+import com.example.todo.exception.ExceptionStatus;
 import com.example.todo.repository.TodoRepository;
 import com.example.todo.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +52,9 @@ public class TodoService {
         User user = getUserFromServlet(request);
         user = getUser(response, user);
 
+        if (user.getTodoList().isEmpty()) {
+            throw new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND));
+        }
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
         Page<Todo> todoPage = todoRepository.findAllByUser(pageable, user);
@@ -80,8 +83,10 @@ public class TodoService {
     public TodoListDto findTodoById(Long id, HttpServletRequest request, HttpServletResponse response) {
 
         User user = getUserFromServlet(request);
+        user = getUser(response, user);
 
-        Todo todo = todoRepository.findByIdAndUser(id, user).orElseThrow(EntityNotFoundException::new);
+        Todo todo = todoRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
 
         return TodoListDto.builder()
                 .title(todo.getTitle())
@@ -95,7 +100,9 @@ public class TodoService {
         User user = getUserFromServlet(request);
         user = getUser(response, user);
 
-        Todo todo = todoRepository.findByIdAndUser(id, user).orElseThrow(EntityNotFoundException::new);
+        Todo todo = todoRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
+
         todo.setTitle(todoDto.getTitle());
 
         return TodoDto.builder()
@@ -109,7 +116,9 @@ public class TodoService {
         User user = getUserFromServlet(request);
         user = getUser(response, user);
 
-        Todo todo = todoRepository.findByIdAndUser(id, user).orElseThrow(EntityNotFoundException::new);
+        Todo todo = todoRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
+
         todoRepository.delete(todo);
     }
 
@@ -119,7 +128,9 @@ public class TodoService {
         User user = getUserFromServlet(request);
         user = getUser(response, user);
 
-        Todo todo = todoRepository.findByIdAndUser(id, user).orElseThrow(EntityNotFoundException::new);
+        Todo todo = todoRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
+
         todo.setCompleted(true);
 
         return TodoListDto.builder()
@@ -128,21 +139,22 @@ public class TodoService {
                 .build();
     }
 
+
+    private User getUserFromServlet(HttpServletRequest request){
+        String username = (String) request.getAttribute("username");
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
     private User getUser(HttpServletResponse response, User user) {
 
         if (user == null) {
             String newAccessToken = response.getHeader("Authorization");
             String username = jwtTokenProvider.getUsernameFromToken(newAccessToken);
 
-            user = userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
+            user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException(String.valueOf(ExceptionStatus.NOT_FOUND)));
         }
 
         return user;
-    }
-
-
-    private User getUserFromServlet(HttpServletRequest request){
-        String username = (String) request.getAttribute("username");
-        return userRepository.findByUsername(username).orElse(null);
     }
 }

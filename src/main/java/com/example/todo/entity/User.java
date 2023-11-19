@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CollectionId;
 
+import java.util.List;
+
 
 @Entity
 @Builder
@@ -22,4 +24,7 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    private List<Todo> todoList;
 }

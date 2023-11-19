@@ -22,7 +22,7 @@ public class Todo extends BaseEntity {
     @Column(nullable = false)
     private Boolean completed;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
