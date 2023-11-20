@@ -1,7 +1,7 @@
 package com.example.todo.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
@@ -13,40 +13,36 @@ import java.lang.reflect.Method;
 @Slf4j
 public class LoggingAspect {
 
-    // com.example.controller 이하 패키지의 모든 클래스 이하 모든 메서드에 적용
     @Pointcut("execution(* com.example.todo.controller..*.*(..))")
     private void cut(){}
 
-    // Pointcut에 의해 필터링된 경로로 들어오는 경우 메서드 호출 전에 적용
-    @Before("cut()")
-    public void beforeParameterLog(JoinPoint joinPoint) {
+    @Around("cut()")
+    public Object aroundLog(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         // 메서드 정보 받아오기
-        Method method = getMethod(joinPoint);
+        Method method = getMethod(proceedingJoinPoint);
         log.info("======= method name = {} =======", method.getName());
 
         // 파라미터 받아오기
-        Object[] args = joinPoint.getArgs();
+        Object[] args = proceedingJoinPoint.getArgs();
         if (args.length == 0) log.info("no parameter");
         for (Object arg : args) {
             log.info("parameter type = {}", arg.getClass().getSimpleName());
             log.info("parameter value = {}", arg);
         }
-    }
 
-    // Poincut에 의해 필터링된 경로로 들어오는 경우 메서드 리턴 후에 적용
-    @AfterReturning(value = "cut()", returning = "returnObj")
-    public void afterReturnLog(JoinPoint joinPoint, Object returnObj) {
-        // 메서드 정보 받아오기
-        Method method = getMethod(joinPoint);
-        log.info("======= method name = {} =======", method.getName());
+        // proceed()를 호출하여 실제 메서드 실행
+        Object returnObj = proceedingJoinPoint.proceed();
 
+        // 메서드의 리턴값 로깅
         log.info("return type = {}", returnObj.getClass().getSimpleName());
         log.info("return value = {}", returnObj);
+
+        return returnObj;
     }
 
-    // JoinPoint로 메서드 정보 가져오기
-    private Method getMethod(JoinPoint joinPoint) {
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+
+    private Method getMethod(ProceedingJoinPoint proceedingJoinPoint) {
+        MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
         return signature.getMethod();
     }
 
