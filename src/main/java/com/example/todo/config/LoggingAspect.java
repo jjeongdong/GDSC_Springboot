@@ -25,6 +25,7 @@ public class LoggingAspect {
         // 파라미터 받아오기
         Object[] args = proceedingJoinPoint.getArgs();
         if (args.length == 0) log.info("no parameter");
+
         for (Object arg : args) {
             log.info("parameter type = {}", arg.getClass().getSimpleName());
             log.info("parameter value = {}", arg);

@@ -20,7 +20,7 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private static final String[] WHITE_LIST = {"/users/signup", "/users/login"};
+    private static final String[] LIST = {"/users/signup", "/users/login"};
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -68,6 +68,6 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private boolean isWhitelistedPath(String requestURI) {
-        return PatternMatchUtils.simpleMatch(WHITE_LIST, requestURI);
+        return PatternMatchUtils.simpleMatch(LIST, requestURI);
     }
 }

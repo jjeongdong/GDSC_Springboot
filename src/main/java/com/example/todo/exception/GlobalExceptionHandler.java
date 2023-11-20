@@ -29,14 +29,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(final CustomException e) {
+    public ResponseEntity<ExceptionResponse> handleBusinessException(final CustomException e) {
         String errorMessage = e.getExceptionStatus().getMessage();
         String status = e.getExceptionStatus().getStatus();
 
-        ErrorResponse errorResponse = new ErrorResponse(status, errorMessage);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(status, errorMessage);
 
         return ResponseEntity.status(determineHttpStatus(e))
-                .body(errorResponse);
+                .body(exceptionResponse);
     }
 
 
