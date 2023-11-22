@@ -11,7 +11,7 @@ services:
       MYSQL_ROOT_PASSWORD: 924498
       TZ: 'Asia/Seoul'
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - ./mysql/conf.d:/etc/mysql/conf.d # MySQL 설정 파일 위치
     command:

@@ -1,7 +1,9 @@
 spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/springboot?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://mysql_db:3306/springboot?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
     password: 924498
   thymeleaf:
@@ -16,6 +18,9 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+  web:
+    resources:
+      add-mappings: false
 
 logging:
   level:

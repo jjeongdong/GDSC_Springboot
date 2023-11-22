@@ -1,12 +1,15 @@
 package com.example.todo.exception;
 
+import com.sun.jdi.request.InvalidRequestStateException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,8 +31,8 @@ public class GlobalExceptionHandler {
                 .body(errors);
     }
 
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ExceptionResponse> handleBusinessException(final CustomException e) {
+    @ExceptionHandler(ServiceException.class)
+    public ResponseEntity<ExceptionResponse> handleBusinessException(final ServiceException e) {
         String errorMessage = e.getExceptionStatus().getMessage();
         String status = e.getExceptionStatus().getStatus();
 
@@ -39,6 +42,10 @@ public class GlobalExceptionHandler {
                 .body(exceptionResponse);
     }
 
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<String> handleNoHandlerFoundException() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 요청을 찾을 수 없습니다.");
+    }
 
     private HttpStatus determineHttpStatus(final RuntimeException e) {
         if (e instanceof IllegalArgumentException) {
