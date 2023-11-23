@@ -60,6 +60,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         } catch (SignatureException e) {
             throw new RuntimeException(String.valueOf(ExceptionStatus.INVALID_TOKEN));
+        } catch (NullPointerException e) {
+            throw new RuntimeException(String.valueOf(ExceptionStatus.TOKEN_NOT_FOUND));
         }
 
         filterChain.doFilter(request, response);

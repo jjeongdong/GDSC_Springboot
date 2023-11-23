@@ -3,9 +3,13 @@ spring:
     throw-exception-if-no-handler-found: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql_db:3306/${MYSQL_DATABASE}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    #    Docker 설정시
+    #    url: jdbc:mysql://mysql_db:3306/${MYSQL_DATABASE}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    #    username: ${SPRING_DATASOURCE_USERNAME}
+    #    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:mysql://localhost:3306/springboot?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: 924498
   thymeleaf:
     cache: false
 
