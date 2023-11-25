@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
                 .body(errors);
     }
 
-    @ExceptionHandler({ServiceException.class, NoHandlerFoundException.class, HttpRequestMethodNotSupportedException.class})
+    @ExceptionHandler({CustomException.class, NoHandlerFoundException.class, HttpRequestMethodNotSupportedException.class})
     public ResponseEntity<Object> handleException(Exception e) {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus status = determineHttpStatus(e);
@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
     }
 
     private HttpStatus determineHttpStatus(Exception e) {
-        if (e instanceof ServiceException) {
+        if (e instanceof CustomException) {
             return HttpStatus.INTERNAL_SERVER_ERROR;
         } else if (e instanceof NoHandlerFoundException) {
             return HttpStatus.NOT_FOUND;
@@ -58,8 +58,8 @@ public class GlobalExceptionHandler {
     }
 
     private String getStatus(Exception e) {
-        if (e instanceof ServiceException) {
-            return ((ServiceException) e).getExceptionStatus().getStatus();
+        if (e instanceof CustomException) {
+            return ((CustomException) e).getErrorCode().getStatus();
         } else if (e instanceof NoHandlerFoundException) {
             return String.valueOf(HttpStatus.NOT_FOUND);
         } else if (e instanceof HttpRequestMethodNotSupportedException) {
@@ -69,8 +69,8 @@ public class GlobalExceptionHandler {
     }
 
     private String getErrorMessage(Exception e) {
-        if (e instanceof ServiceException) {
-            return ((ServiceException) e).getExceptionStatus().getMessage();
+        if (e instanceof CustomException) {
+            return ((CustomException) e).getErrorCode().getMessage();
         } else if (e instanceof NoHandlerFoundException) {
             return "해당 요청을 찾을 수 없습니다.";
         } else if (e instanceof HttpRequestMethodNotSupportedException) {

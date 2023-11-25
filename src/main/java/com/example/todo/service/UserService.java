@@ -6,8 +6,8 @@ import com.example.todo.dto.UserRequestDto;
 import com.example.todo.dto.UserResponseDto;
 import com.example.todo.entity.RefreshToken;
 import com.example.todo.entity.User;
-import com.example.todo.exception.ExceptionStatus;
-import com.example.todo.exception.ServiceException;
+import com.example.todo.exception.ErrorCode;
+import com.example.todo.exception.CustomException;
 import com.example.todo.repository.RefreshTokenRepository;
 import com.example.todo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class UserService {
                 .build();
 
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new ServiceException(ExceptionStatus.DUPLICATE_USER_ID);
+            throw new CustomException(ErrorCode.DUPLICATE_USER_ID);
         }
 
         userRepository.save(user);
@@ -49,7 +49,7 @@ public class UserService {
     @Transactional
     public TokenResponse login(String username, String password) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ServiceException(ExceptionStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (user != null && Objects.equals(user.getPassword(), passwordEncryptionService.encrypt(password))) {
 
@@ -76,7 +76,7 @@ public class UserService {
 
             return new TokenResponse(accessToken, newRefreshToken);
         } else {
-            throw new ServiceException(ExceptionStatus.WRONG_PASSWORD);
+            throw new CustomException(ErrorCode.WRONG_PASSWORD);
         }
     }
 

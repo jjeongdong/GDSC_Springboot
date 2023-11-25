@@ -1,6 +1,6 @@
 package com.example.todo.config;
 
-import com.example.todo.exception.ExceptionStatus;
+import com.example.todo.exception.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.*;
@@ -59,9 +59,9 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setHeader("Authorization", "Bearer " + newAccessToken);
 
         } catch (SignatureException e) {
-            throw new RuntimeException(String.valueOf(ExceptionStatus.INVALID_TOKEN));
+            throw new RuntimeException(String.valueOf(ErrorCode.INVALID_TOKEN));
         } catch (NullPointerException e) {
-            throw new RuntimeException(String.valueOf(ExceptionStatus.TOKEN_NOT_FOUND));
+            throw new RuntimeException(String.valueOf(ErrorCode.TOKEN_NOT_FOUND));
         }
 
         filterChain.doFilter(request, response);

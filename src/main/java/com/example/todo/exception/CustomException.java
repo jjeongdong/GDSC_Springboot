@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class ServiceException extends RuntimeException {
+public class CustomException extends RuntimeException {
 
-    private final ExceptionStatus exceptionStatus;
+    private final ErrorCode errorCode;
 
 }
