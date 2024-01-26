@@ -26,4 +26,7 @@ public class Todo extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private void complete() {
+        this.completed = true;
+    }
 }

@@ -29,7 +29,6 @@ public class UserService {
 
     @Transactional
     public UserResponseDto signup(UserRequestDto userRequestDto) {
-
         User user = User.builder()
                 .username(userRequestDto.getUsername())
                 .password(passwordEncryptionService.encrypt(userRequestDto.getPassword()))

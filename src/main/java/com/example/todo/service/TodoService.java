@@ -33,13 +33,11 @@ public class TodoService {
 
     @Transactional
     public TodoDto createTodo(TodoDto todoDto, HttpServletRequest request, HttpServletResponse response) {
-
         User user = getUserFromServlet(request);
         user = getUser(response, user);
 
         Todo todo = Todo.builder()
                 .title(todoDto.getTitle())
-                .completed(false)
                 .user(user)
                 .build();
 
@@ -49,7 +47,6 @@ public class TodoService {
 
     @Transactional(readOnly = true)
     public PageResponseDto findAll(int pageNo, int pageSize, String sortBy, HttpServletRequest request, HttpServletResponse response) {
-
         User user = getUserFromServlet(request);
         user = getUser(response, user);
 
@@ -82,7 +79,6 @@ public class TodoService {
 
     @Transactional(readOnly = true)
     public TodoListDto findTodoById(Long id, HttpServletRequest request, HttpServletResponse response) {
-
         User user = getUserFromServlet(request);
         user = getUser(response, user);
 
@@ -97,7 +93,6 @@ public class TodoService {
 
     @Transactional
     public TodoDto updateTodoById(Long id, TodoDto todoDto, HttpServletRequest request, HttpServletResponse response) {
-
         User user = getUserFromServlet(request);
         user = getUser(response, user);
 
@@ -113,7 +108,6 @@ public class TodoService {
 
     @Transactional
     public void deleteTodoById(Long id, HttpServletRequest request, HttpServletResponse response) {
-
         User user = getUserFromServlet(request);
         user = getUser(response, user);
 
@@ -124,15 +118,14 @@ public class TodoService {
     }
 
     @Transactional
-    public TodoListDto complete(Long id, HttpServletRequest request, HttpServletResponse response) {
-
+    public TodoListDto completeTodo(Long id, HttpServletRequest request, HttpServletResponse response) {
         User user = getUserFromServlet(request);
         user = getUser(response, user);
 
         Todo todo = todoRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new CustomException(ErrorCode.TODO_NOT_FOUND));
 
-        todo.setCompleted(true);
+        complete(todo);
 
         return TodoListDto.builder()
                 .title(todo.getTitle())
@@ -140,8 +133,11 @@ public class TodoService {
                 .build();
     }
 
+    private void complete(Todo todo) {
+        todo.setCompleted(true);
+    }
 
-    private User getUserFromServlet(HttpServletRequest request){
+    private User getUserFromServlet(HttpServletRequest request) {
         String username = (String) request.getAttribute("username");
         return userRepository.findByUsername(username).orElse(null);
     }

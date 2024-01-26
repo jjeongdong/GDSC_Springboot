@@ -56,7 +56,7 @@ public class TodoController {
 
     @PostMapping("/{id}")
     public ResponseEntity<TodoListDto> complete(@PathVariable Long id, HttpServletRequest request, HttpServletResponse response) {
-        TodoListDto todoListDto = todoService.complete(id, request, response);
+        TodoListDto todoListDto = todoService.completeTodo(id, request, response);
         return ResponseEntity.ok(todoListDto);
     }
 
